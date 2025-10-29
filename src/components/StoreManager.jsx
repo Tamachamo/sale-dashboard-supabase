@@ -1,6 +1,6 @@
 // src/components/StoreManager.jsx
 import { useEffect, useState } from 'react'
-import { listStores, createStore, updateStore } from '../api'
+import { listStores, createStore, updateStore, deleteStore } from '../api'
 
 export default function StoreManager() {
   const [stores, setStores] = useState([])
@@ -37,6 +37,21 @@ export default function StoreManager() {
     load()
   }
 
+  async function onDelete(id, name) {
+    if (!confirm(`店舗「${name}」を削除します。よろしいですか？`)) return
+    setBusy(true)
+    const r = await deleteStore(id)
+    setBusy(false)
+    if (!r.ok) {
+      // 外部キー制約などの人間向けメッセージ
+      const msg = (r.error?.code === '23503' || /foreign key|参照|constraint/i.test(r.error?.message || ''))
+        ? 'この店舗に紐づく売上データがあるため削除できません。先に該当売上の店舗を変更/削除してください。'
+        : `削除失敗: ${r.error?.message || '不明なエラー'}`
+      return alert(msg)
+    }
+    load()
+  }
+
   return (
     <div className="space-y-4">
       <form onSubmit={onAdd} className="flex gap-2">
@@ -60,7 +75,7 @@ export default function StoreManager() {
           <thead>
             <tr className="border-b bg-slate-50">
               <th className="text-left p-3">店舗名</th>
-              <th className="p-3 w-32">操作</th>
+              <th className="p-3 w-48">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -97,14 +112,24 @@ export default function StoreManager() {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    type="button"
-                    className="px-3 py-1 rounded-lg border"
-                    onClick={()=>{ setEditingId(s.id); setEditingName(s.name) }}
-                    disabled={busy}
-                  >
-                    変更
-                  </button>
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      type="button"
+                      className="px-3 py-1 rounded-lg border"
+                      onClick={()=>{ setEditingId(s.id); setEditingName(s.name) }}
+                      disabled={busy}
+                    >
+                      変更
+                    </button>
+                    <button
+                      type="button"
+                      className="px-3 py-1 rounded-lg border text-red-600"
+                      onClick={()=>onDelete(s.id, s.name)}
+                      disabled={busy}
+                    >
+                      削除
+                    </button>
+                  </div>
                 )}
               </td>
             </tr>
