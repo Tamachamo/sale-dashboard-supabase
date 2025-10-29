@@ -32,6 +32,15 @@ export async function updateStore(id, name) {
   return { ok:true, store: data }
 }
 
+export async function deleteStore(id) {
+  const { error } = await supabase
+    .from('stores')
+    .delete()
+    .eq('id', id)
+  if (error) return { ok:false, error }
+  return { ok:true }
+}
+
 /** ---------- Sales (売上) ---------- */
 export async function submitSale(payload) {
   const { data, error } = await supabase.from('sales').insert([{
@@ -69,7 +78,6 @@ export async function fetchRows({ storeId='ALL', start='', end='', limit=500 } =
 }
 
 export async function updateSale(id, patch) {
-  // patch には {price_total, chip_type, size_cls, size_digits, store_id, manual_month} 等が入る
   const { data, error } = await supabase
     .from('sales')
     .update(patch)
@@ -80,4 +88,13 @@ export async function updateSale(id, patch) {
     `).single()
   if (error) return { ok:false, error: error.message }
   return { ok:true, data }
+}
+
+export async function deleteSale(id) {
+  const { error } = await supabase
+    .from('sales')
+    .delete()
+    .eq('id', id)
+  if (error) return { ok:false, error }
+  return { ok:true }
 }
