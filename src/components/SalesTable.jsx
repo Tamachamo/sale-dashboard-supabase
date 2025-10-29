@@ -1,7 +1,7 @@
 // src/components/SalesTable.jsx
 import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
-import { updateSale } from '../api'
+import { updateSale, deleteSale } from '../api'
 
 export default function SalesTable({ rows, stores, onUpdated }) {
   const [editId, setEditId] = useState(null)
@@ -40,6 +40,15 @@ export default function SalesTable({ rows, stores, onUpdated }) {
     onUpdated && onUpdated()
   }
 
+  async function removeRow(id) {
+    if (!confirm('この売上データを削除します。よろしいですか？')) return
+    setBusy(true)
+    const r = await deleteSale(id)
+    setBusy(false)
+    if (!r.ok) return alert('削除失敗: ' + (r.error?.message || '不明なエラー'))
+    onUpdated && onUpdated()
+  }
+
   return (
     <div className="rounded-2xl border bg-white overflow-x-auto">
       <table className="w-full text-sm">
@@ -52,7 +61,7 @@ export default function SalesTable({ rows, stores, onUpdated }) {
             <th className="text-left p-3">S/M/L</th>
             <th className="text-left p-3">5桁</th>
             <th className="text-right p-3">価格</th>
-            <th className="p-3 w-40">操作</th>
+            <th className="p-3 w-52">操作</th>
           </tr>
         </thead>
         <tbody>
@@ -62,68 +71,58 @@ export default function SalesTable({ rows, stores, onUpdated }) {
               <tr key={r.id} className="border-b last:border-b-0 align-top">
                 <td className="p-3 whitespace-nowrap">{dayjs(r.created_at).format('YYYY/MM/DD HH:mm')}</td>
                 <td className="p-3">{r.manual_month || r.month}</td>
-                <td className="p-3">
-                  {isEdit ? (
-                    <select
-                      className="w-full rounded-lg border p-2"
-                      value={draft.store_id || ''}
-                      onChange={(e)=>setDraft(d=>({...d, store_id:e.target.value}))}
-                      disabled={busy}
-                    >
-                      <option value="">（未選択）</option>
-                      {stores.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                    </select>
-                  ) : (r.stores?.name || '(未設定)')}
-                </td>
-                <td className="p-3">
-                  {isEdit ? (
-                    <select
-                      className="w-full rounded-lg border p-2"
-                      value={draft.chip_type}
-                      onChange={(e)=>setDraft(d=>({...d, chip_type:e.target.value}))}
-                      disabled={busy}
-                    >
-                      <option>ショートオーバル</option>
-                      <option>ベリーショート</option>
-                    </select>
-                  ) : r.chip_type}
-                </td>
-                <td className="p-3">
-                  {isEdit ? (
-                    <select
-                      className="w-full rounded-lg border p-2"
-                      value={draft.size_cls || ''}
-                      onChange={(e)=>setDraft(d=>({...d, size_cls:e.target.value}))}
-                      disabled={busy}
-                    >
-                      <option value="">（空）</option>
-                      <option value="S">S</option>
-                      <option value="M">M</option>
-                      <option value="L">L</option>
-                    </select>
-                  ) : (r.size_cls || '')}
-                </td>
-                <td className="p-3">
-                  {isEdit ? (
-                    <input
-                      className="w-28 rounded-lg border p-2"
-                      value={draft.size_digits || ''}
-                      onChange={(e)=>setDraft(d=>({...d, size_digits:e.target.value}))}
-                      disabled={busy}
-                    />
-                  ) : (r.size_digits || '')}
-                </td>
-                <td className="p-3 text-right">
-                  {isEdit ? (
-                    <input
-                      type="number"
-                      className="w-28 rounded-lg border p-2 text-right"
-                      value={draft.price_total}
-                      onChange={(e)=>setDraft(d=>({...d, price_total:e.target.value}))}
-                      disabled={busy}
-                    />
-                  ) : r.price_total?.toLocaleString()}
-                </td>
+                <td className="p-3">{isEdit ? (
+                  <select
+                    className="w-full rounded-lg border p-2"
+                    value={draft.store_id || ''}
+                    onChange={(e)=>setDraft(d=>({...d, store_id:e.target.value}))}
+                    disabled={busy}
+                  >
+                    <option value="">（未選択）</option>
+                    {stores.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                ) : (r.stores?.name || '(未設定)')}</td>
+                <td className="p-3">{isEdit ? (
+                  <select
+                    className="w-full rounded-lg border p-2"
+                    value={draft.chip_type}
+                    onChange={(e)=>setDraft(d=>({...d, chip_type:e.target.value}))}
+                    disabled={busy}
+                  >
+                    <option>ショートオーバル</option>
+                    <option>ベリーショート</option>
+                  </select>
+                ) : r.chip_type}</td>
+                <td className="p-3">{isEdit ? (
+                  <select
+                    className="w-full rounded-lg border p-2"
+                    value={draft.size_cls || ''}
+                    onChange={(e)=>setDraft(d=>({...d, size_cls:e.target.value}))}
+                    disabled={busy}
+                  >
+                    <option value="">（空）</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                  </select>
+                ) : (r.size_cls || '')}</td>
+                <td className="p-3">{isEdit ? (
+                  <input
+                    className="w-28 rounded-lg border p-2"
+                    value={draft.size_digits || ''}
+                    onChange={(e)=>setDraft(d=>({...d, size_digits:e.target.value}))}
+                    disabled={busy}
+                  />
+                ) : (r.size_digits || '')}</td>
+                <td className="p-3 text-right">{isEdit ? (
+                  <input
+                    type="number"
+                    className="w-28 rounded-lg border p-2 text-right"
+                    value={draft.price_total}
+                    onChange={(e)=>setDraft(d=>({...d, price_total:e.target.value}))}
+                    disabled={busy}
+                  />
+                ) : r.price_total?.toLocaleString()}</td>
                 <td className="p-3">
                   {isEdit ? (
                     <div className="flex gap-2 justify-end">
@@ -143,12 +142,21 @@ export default function SalesTable({ rows, stores, onUpdated }) {
                       </button>
                     </div>
                   ) : (
-                    <button
-                      className="px-3 py-1 rounded-lg border"
-                      onClick={()=>startEdit(r)}
-                    >
-                      編集
-                    </button>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        className="px-3 py-1 rounded-lg border"
+                        onClick={()=>startEdit(r)}
+                      >
+                        編集
+                      </button>
+                      <button
+                        className="px-3 py-1 rounded-lg border text-red-600"
+                        onClick={()=>removeRow(r.id)}
+                        disabled={busy}
+                      >
+                        削除
+                      </button>
+                    </div>
                   )}
                 </td>
               </tr>
