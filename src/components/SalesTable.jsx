@@ -14,11 +14,13 @@ export default function SalesTable({ rows, stores, onUpdated }) {
     setEditId(row.id)
     setDraft({
       chip_type: row.chip_type,
+      chip_number: row.chip_number || '',   // 追加
       size_cls: row.size_cls || '',
       size_digits: row.size_digits || '',
       price_total: row.price_total,
       store_id: row.store_id || '',
-      manual_month: row.manual_month || ''
+      manual_month: row.manual_month || '',
+      note: row.note || ''                  // 追加
     })
   }
 
@@ -26,11 +28,13 @@ export default function SalesTable({ rows, stores, onUpdated }) {
     setBusy(true)
     const patch = {
       chip_type: draft.chip_type,
+      chip_number: draft.chip_number || null, // 追加
       size_cls: draft.size_cls || null,
       size_digits: draft.size_digits || null,
       price_total: Number(draft.price_total),
       store_id: draft.store_id || null,
-      manual_month: draft.manual_month || null
+      manual_month: draft.manual_month || null,
+      note: draft.note || null               // 追加
     }
     const r = await updateSale(editId, patch)
     setBusy(false)
@@ -58,10 +62,12 @@ export default function SalesTable({ rows, stores, onUpdated }) {
             <th className="text-left p-3">月</th>
             <th className="text-left p-3">店舗</th>
             <th className="text-left p-3">種類</th>
+            <th className="text-left p-3">番号</th>      {/* 追加 */}
             <th className="text-left p-3">S/M/L</th>
             <th className="text-left p-3">5桁</th>
             <th className="text-right p-3">価格</th>
-            <th className="p-3 w-52">操作</th>
+            <th className="text-left p-3">備考</th>     {/* 追加 */}
+            <th className="p-3 w-56">操作</th>
           </tr>
         </thead>
         <tbody>
@@ -94,6 +100,14 @@ export default function SalesTable({ rows, stores, onUpdated }) {
                   </select>
                 ) : r.chip_type}</td>
                 <td className="p-3">{isEdit ? (
+                  <input
+                    className="w-28 rounded-lg border p-2"
+                    value={draft.chip_number || ''}
+                    onChange={(e)=>setDraft(d=>({...d, chip_number:e.target.value}))}
+                    disabled={busy}
+                  />
+                ) : (r.chip_number || '')}</td>
+                <td className="p-3">{isEdit ? (
                   <select
                     className="w-full rounded-lg border p-2"
                     value={draft.size_cls || ''}
@@ -123,6 +137,15 @@ export default function SalesTable({ rows, stores, onUpdated }) {
                     disabled={busy}
                   />
                 ) : r.price_total?.toLocaleString()}</td>
+                <td className="p-3">{isEdit ? (
+                  <textarea
+                    className="w-full rounded-lg border p-2"
+                    rows={2}
+                    value={draft.note || ''}
+                    onChange={(e)=>setDraft(d=>({...d, note:e.target.value}))}
+                    disabled={busy}
+                  />
+                ) : (r.note || '')}</td>
                 <td className="p-3">
                   {isEdit ? (
                     <div className="flex gap-2 justify-end">
@@ -143,19 +166,8 @@ export default function SalesTable({ rows, stores, onUpdated }) {
                     </div>
                   ) : (
                     <div className="flex gap-2 justify-end">
-                      <button
-                        className="px-3 py-1 rounded-lg border"
-                        onClick={()=>startEdit(r)}
-                      >
-                        編集
-                      </button>
-                      <button
-                        className="px-3 py-1 rounded-lg border text-red-600"
-                        onClick={()=>removeRow(r.id)}
-                        disabled={busy}
-                      >
-                        削除
-                      </button>
+                      <button className="px-3 py-1 rounded-lg border" onClick={()=>startEdit(r)}>編集</button>
+                      <button className="px-3 py-1 rounded-lg border text-red-600" onClick={()=>removeRow(r.id)} disabled={busy}>削除</button>
                     </div>
                   )}
                 </td>
@@ -163,7 +175,7 @@ export default function SalesTable({ rows, stores, onUpdated }) {
             )
           })}
           {rows.length === 0 && (
-            <tr><td className="p-4 text-slate-500" colSpan={8}>データがありません。</td></tr>
+            <tr><td className="p-4 text-slate-500" colSpan={10}>データがありません。</td></tr>
           )}
         </tbody>
       </table>
