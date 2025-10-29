@@ -127,7 +127,7 @@ export default function App() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">価格（税込）</label>
+                <label className="block text-sm font-medium mb-1">価格</label>
                 <input type="number" min="0" step="1"
                   className="w-full rounded-xl border p-2 text-right"
                   placeholder="例: 3200"
