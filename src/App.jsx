@@ -8,23 +8,25 @@ import { listStores, submitSale, fetchRows } from './api'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
-createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } }) // 初期化だけ
+createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } })
 
 const CHIP_TYPES = ['ショートオーバル','ベリーショート']
 const SIZE_MAP = { S: '26569', M: '15458', L: '04347' }
 
 export default function App() {
-  const [tab, setTab] = useState('dashboard') // ← 既定をダッシュボードに
+  const [tab, setTab] = useState('dashboard')
   const [stores, setStores] = useState([])
-  const [rows, setRows] = useState([]) // 売上一覧用（ダッシュボードとは別fetch）
+  const [rows, setRows] = useState([])
 
   const [form, setForm] = useState({
     chip_type: CHIP_TYPES[0],
+    chip_number: '',        // 追加
     size_cls: '',
     size_digits: '',
     price_total: '',
     store_id: '',
-    month: ''
+    month: '',
+    note: ''                // 追加
   })
   const [submitting, setSubmitting] = useState(false)
 
@@ -33,16 +35,12 @@ export default function App() {
     if (r.ok) setStores(r.stores)
   }
   async function loadList() {
-    const r = await fetchRows({ limit: 500 }) // 一覧は直近を素直に表示（必要に応じて拡張可）
+    const r = await fetchRows({ limit: 500 })
     if (r.ok) setRows(r.rows)
   }
 
-  useEffect(() => { (async () => {
-    await loadStores()
-    await loadList()
-  })() }, [])
+  useEffect(() => { (async () => { await loadStores(); await loadList() })() }, [])
 
-  // S/M/L → 5桁自動反映
   useEffect(() => {
     if (form.size_cls && SIZE_MAP[form.size_cls]) {
       setForm(prev => ({ ...prev, size_digits: SIZE_MAP[prev.size_cls] }))
@@ -58,9 +56,11 @@ export default function App() {
     setForm(prev => ({
       ...prev,
       price_total: '',
+      chip_number: '',
+      note: '',
       size_digits: prev.size_cls ? SIZE_MAP[prev.size_cls] : ''
     }))
-    await loadList() // 一覧を更新
+    await loadList()
     alert('登録しました')
   }
 
@@ -95,6 +95,15 @@ export default function App() {
                   onChange={e=>setForm({...form, chip_type:e.target.value})}>
                   {CHIP_TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
+              </div>
+
+              {/* 追加：チップ番号 */}
+              <div>
+                <label className="block text-sm font-medium mb-1">チップ番号</label>
+                <input className="w-full rounded-xl border p-2"
+                  placeholder="任意の番号"
+                  value={form.chip_number}
+                  onChange={(e)=>setForm({...form, chip_number:e.target.value})} />
               </div>
 
               <div>
@@ -143,6 +152,18 @@ export default function App() {
                 <input type="month" className="w-full rounded-xl border p-2"
                   value={form.month}
                   onChange={e=>setForm({...form, month:e.target.value})}/>
+              </div>
+
+              {/* 追加：備考（最後） */}
+              <div className="md:col-span-3">
+                <label className="block text-sm font-medium mb-1">備考</label>
+                <textarea
+                  className="w-full rounded-xl border p-2"
+                  rows={3}
+                  placeholder="メモなど（任意）"
+                  value={form.note}
+                  onChange={(e)=>setForm({...form, note:e.target.value})}
+                />
               </div>
 
               <div className="md:col-span-3">
