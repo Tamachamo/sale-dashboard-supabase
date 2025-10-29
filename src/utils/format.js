@@ -1,0 +1,1 @@
+export const yen=(n)=>new Intl.NumberFormat('ja-JP',{style:'currency',currency:'JPY'}).format(n||0);

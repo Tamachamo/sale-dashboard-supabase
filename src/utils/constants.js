@@ -1,0 +1,1 @@
+export const SIZE_MAP={S:'26569',M:'15458',L:'04347'};export const CHIP_TYPES=['ショートオーバル','ベリーショート'];
