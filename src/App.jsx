@@ -68,7 +68,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50">
       <header className="px-6 py-4 bg-white border-b">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-2xl font-bold">ネイルチップ販売管理（Supabase）</h1>
+          <h1 className="text-2xl font-bold">ネイルチップ販売管理（urupuya.）</h1>
           <nav className="flex gap-2">
             <button className={`px-3 py-1 rounded-lg ${tab==='dashboard'?'bg-black text-white':'border'}`} onClick={()=>setTab('dashboard')}>ダッシュボード</button>
             <button className={`px-3 py-1 rounded-lg ${tab==='form'?'bg-black text-white':'border'}`} onClick={()=>setTab('form')}>登録</button>
