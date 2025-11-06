@@ -183,3 +183,60 @@ export default function Dashboard() {
     </div>
   )
 }
+
+{/* ▼ 追加：サイズ別 販売数＆売上金額 */}
+<div className="rounded-2xl shadow-md p-5 bg-white">
+  <h2 className="text-lg font-semibold mb-2">サイズ別・販売実績（販売数）</h2>
+  <div className="h-96">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart
+        data={
+          ['S','M','L'].map(size => {
+            const filtered = rows.filter(r => r.size_cls === size)
+            return {
+              size,
+              count: filtered.length,
+              revenue: filtered.reduce((s,r)=>s+(r.price_total||0),0)
+            }
+          })
+        }
+        margin={{ left: 8, right: 16 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="size" />
+        <YAxis allowDecimals={false} />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="count" name="販売数" />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
+<div className="rounded-2xl shadow-md p-5 bg-white mt-6">
+  <h2 className="text-lg font-semibold mb-2">サイズ別・売上金額（税抜）</h2>
+  <div className="h-96">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart
+        data={
+          ['S','M','L'].map(size => {
+            const filtered = rows.filter(r => r.size_cls === size)
+            return {
+              size,
+              count: filtered.length,
+              revenue: filtered.reduce((s,r)=>s+(r.price_total||0),0)
+            }
+          })
+        }
+        margin={{ left: 8, right: 16 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="size" />
+        <YAxis allowDecimals={false} />
+        <Tooltip formatter={(v, n) => n === 'revenue' ? [yen(v), '売上'] : [v, n]} />
+        <Legend />
+        <Bar dataKey="revenue" name="売上金額（税抜）" />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
