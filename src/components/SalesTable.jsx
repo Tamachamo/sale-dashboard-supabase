@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { updateSale, deleteSale } from '../api'
 
-
 export default function SalesTable({ rows, stores, onUpdated }) {
   const [editId, setEditId] = useState(null)
   const [draft, setDraft] = useState({})
