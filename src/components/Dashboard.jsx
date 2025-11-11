@@ -8,9 +8,6 @@ import {
 const yen = (n) =>
   new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(n || 0)
 
-useEffect(() => {
-  localStorage.setItem('lastPage', '/Dashboard')
-}, [])
 
 export default function Dashboard() {
   const [stores, setStores] = useState([])
