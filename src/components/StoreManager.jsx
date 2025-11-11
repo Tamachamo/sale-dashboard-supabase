@@ -2,9 +2,6 @@
 import { useEffect, useState } from 'react'
 import { listStores, createStore, updateStore, deleteStore } from '../api'
 
-useEffect(() => {
-  localStorage.setItem('lastPage', '/stores')
-}, [])
 
 export default function StoreManager() {
   const [stores, setStores] = useState([])
