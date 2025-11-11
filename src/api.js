@@ -67,8 +67,6 @@ export async function fetchRows({ storeId='ALL', start='', end='', limit=500 } =
     .order('created_at', { ascending: false })
     .limit(limit)
 
-  if (start) q = q.gte('month', start)
-  if (end)   q = q.lte('month', end)
   if (storeId !== 'ALL') q = q.eq('store_id', storeId)
 
   const { data, error } = await q
