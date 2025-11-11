@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react'
 import { listStores, createStore, updateStore, deleteStore } from '../api'
 
-
 export default function StoreManager() {
   const [stores, setStores] = useState([])
   const [newName, setNewName] = useState('')
