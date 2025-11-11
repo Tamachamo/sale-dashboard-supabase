@@ -30,14 +30,26 @@ export default function Dashboard() {
   }, [storeFilter, startMonth, endMonth])
 
   async function reload() {
-    const r = await fetchRows({
-      storeId: storeFilter,
-      start: startMonth,
-      end: endMonth,
-      limit: 2000,
-    })
-    if (r.ok) setRows(r.rows)
-  }
+  const r = await fetchRows({
+    storeId: storeFilter,
+    limit: 2000, // 期間条件はフロントで処理する
+  })
+  if (!r.ok) return
+  const all = r.rows || []
+
+  // 🔥 売上月(month = "YYYY-MM")でフィルタリング（文字列比較）
+  const filtered = all.filter(row => {
+    if (!row.manual_month) return true
+    return row.manual_month >= startMonth && row.manual_month <= endMonth
+  })
+
+  // 店舗フィルタ（SupabaseでALL指定時に効かないので再確認）
+  const final = storeFilter === 'ALL'
+    ? filtered
+    : filtered.filter(r => r.store_id === storeFilter)
+
+  setRows(final)
+}
 
   // KPI
   const totalRevenue = useMemo(
