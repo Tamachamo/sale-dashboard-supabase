@@ -100,10 +100,15 @@ export default function App() {
               {/* 追加：チップ番号 */}
               <div>
                 <label className="block text-sm font-medium mb-1">チップ番号</label>
-                <input className="w-full rounded-xl border p-2"
-                  placeholder="任意の番号"
-                  value={form.chip_number}
-                  onChange={(e)=>setForm({...form, chip_number:e.target.value})} />
+                <input
+  type="text"
+  inputMode="numeric"
+  pattern="\d*"
+  className="w-full rounded-xl border p-2"
+  placeholder="任意の番号（数字のみ）"
+  value={form.chip_number}
+  onChange={(e)=>setForm({...form, chip_number:e.target.value})}
+/>
               </div>
 
               <div>
@@ -120,10 +125,15 @@ export default function App() {
 
               <div>
                 <label className="block text-sm font-medium mb-1">5桁サイズ</label>
-                <input className="w-full rounded-xl border p-2"
-                  placeholder="例: 26569"
-                  value={form.size_digits}
-                  onChange={e=>setForm({...form, size_digits:e.target.value})}/>
+                <input
+  type="text"
+  inputMode="numeric"
+  pattern="\d*"
+  className="w-full rounded-xl border p-2"
+  placeholder="例: 26569 / 04347"
+  value={form.size_digits}
+  onChange={e=>setForm({...form, size_digits:e.target.value})}
+/>
               </div>
 
               <div>
